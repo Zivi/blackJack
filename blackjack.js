@@ -10,11 +10,11 @@ function startGame() {
   deck = _.shuffle(deck);
   playerHand.push(deck.pop());
   playerHand.push(deck.pop());
-  let score = playerHand[0].value + playerHand[1].value;
-  if (score === 21) {
+  let playerScore = playerHand[0].value + playerHand[1].value;
+  if (playerScore === 21) {
     console.log(
       'Your hand is: ' +
-      playerHand[0].name + ', ' + playerHand[1].name + ' your score is: ' + score +
+      playerHand[0].name + ', ' + playerHand[1].name + ' your score is: ' + playerScore +
       'You win!'
     );
     return;
@@ -22,52 +22,91 @@ function startGame() {
   let move = readlineSync.keyInSelect(
     moveChoices,
     'Your hand is: ' + playerHand[0].name + ', ' + playerHand[1].name +
-    ' your score is: ' + score + ', would you like to hit or stay?');
+    ' your score is: ' + playerScore + ', would you like to hit or stay?');
 
   if (move === 0) {
-    dealCard(playerHand, score);
+    dealCard(playerHand, playerScore);
   } else if (move === 1) {
-   dealerStartGame(playerHand, score);
+   dealerStartGame(playerHand, playerScore);
   }
 }
 
-function dealCard(playerHand, score) {
+function dealCard(playerHand, playerScore) {
   let cardInPlay = deck.pop();
   let cardString = ' Your hand is: ';
   playerHand.push(cardInPlay);
-  score += cardInPlay.value;
+  playerScore += cardInPlay.value;
 
   for (var i = 0; i < playerHand.length; i++) {
     cardString += (playerHand[i].name + ' ');
   }
-
-  if (score === 21) {
+// Loop through deck of cards
+  if (playerScore === 21) {
     console.log(
       'You drew ' + cardInPlay.name + cardString +
       '. Total 21 points. Time for the dealer to draw');
-    return dealerStartGame(score)
+    return dealerStartGame(playerScore)
   }
-  if (score > 21) {
+  if (playerScore > 21) {
     console.log(
       'You drew: ' + cardInPlay.name  + cardString + '. Your score is: ' +
-      score + ' you lose :-('
+      playerScore + ' you lose :-('
     );
   } else {
     let move = readlineSync.keyInSelect(
       moveChoices,
-      cardString + ' your score is: ' + score +
+      cardString + ' your score is: ' + playerScore +
       ', would you like to hit or stay?'
     );
     if (move === 0) {
-      dealCard(playerHand, score);
+      dealCard(playerHand, playerScore);
     } else if (move === 1) {
-     dealerStartGame(score);
+     dealerStartGame(playerScore);
     }
   }
 }
 
-function dealerStartGame(score) {
+function dealerStartGame(playerScore) {
+  dealerHand.push(deck.pop());
+  dealerHand.push(deck.pop());
+  let dealerScore = dealerHand[0].value + dealerHand[1].value;
+  checkScore(playerScore, dealerScore, dealerHand);
+}
 
+function drawCard(playerScore, dealerScore,dealerHand) {
+  dealerHand.push(deck.pop());
+  dealerScore += dealerHand[dealerHand.length - 1].value;
+  checkScore(playerScore, dealerScore, dealerHand);
+}
+
+function checkScore(playerScore, dealerScore, dealerHand) {
+  if (dealerScore > 17) {
+    console.log(
+      'Dealer has dealt ' + dealerHand[0].name + ' and ' + dealerHand[1].name +
+      ' for a total score of ' + dealerScore + ' dealer stays'
+    );
+    readlineSync.keyInPause();
+    if (dealerScore > playerScore) {
+      console.log(
+        'Your score is ' + playerScore + ' dealer score is ' + dealerScore +
+        ' you lose'
+       );
+    } else if (dealerScore === playerScore) {
+      'Your score is ' + playerScore + ' dealer score is ' + dealerScore +
+      ' it is a push'
+    } else {
+      'Your score is ' + playerScore + ' dealer score is ' + dealerScore +
+      ' you win'
+    }
+  } else {
+    // loop through the deck as it gets longer
+    console.log(
+      'Dealer has dealt ' + dealerHand[0].name + ' and ' + dealerHand[1].name +
+      ' for a total score of ' + dealerScore + ' dealer draws again'
+    );
+    readlineSync.keyInPause();
+    drawCard(playerScore, dealerScore, dealerHand);
+  }
 }
 
 startGame();

@@ -37,7 +37,7 @@ function dealCard(playerHand, playerScore) {
   playerHand.push(cardInPlay);
   playerScore += cardInPlay.value;
 
-  for (var i = 0; i < playerHand.length; i++) {
+  for (let i = 0; i < playerHand.length; i++) {
     cardString += (playerHand[i].name + ' ');
   }
 // Loop through deck of cards
@@ -80,28 +80,37 @@ function drawCard(playerScore, dealerScore,dealerHand) {
 }
 
 function checkScore(playerScore, dealerScore, dealerHand) {
-  if (dealerScore > 17) {
+  let dealerCardString = ' Dealer\'s hand is: ';
+  for (let i = 0; i < dealerHand.length; i++) {
+    dealerCardString += (dealerHand[i].name + ' ');
+  }
+dealerScore = 20;
+  if (dealerScore >= 17 && dealerScore < 22) {
     console.log(
-      'Dealer has dealt ' + dealerHand[0].name + ' and ' + dealerHand[1].name +
+      'Dealer has dealt ' + dealerHand[0].name + ' and ' + dealerCardString +
       ' for a total score of ' + dealerScore + ' dealer stays'
     );
-    readlineSync.keyInPause();
     if (dealerScore > playerScore) {
       console.log(
         'Your score is ' + playerScore + ' dealer score is ' + dealerScore +
-        ' you lose'
+        dealerCardString + ' you lose'
        );
     } else if (dealerScore === playerScore) {
-      'Your score is ' + playerScore + ' dealer score is ' + dealerScore +
-      ' it is a push'
-    } else {
-      'Your score is ' + playerScore + ' dealer score is ' + dealerScore +
-      ' you win'
+      console.log(
+        'Your score is ' + playerScore + ' dealer score is ' + dealerScore +
+        dealerCardString +' it is a push'
+      );
+    } else if (dealerScore < playerScore) {
+      console.log(
+        'Your score is ' + playerScore + ' dealer score is ' + dealerScore +
+        dealerCardString + ' you win'
+      );
     }
+  } else if (dealerScore >= 22) {
+    console.log(dealerCardString + 'dealer busts, you win')
   } else {
-    // loop through the deck as it gets longer
     console.log(
-      'Dealer has dealt ' + dealerHand[0].name + ' and ' + dealerHand[1].name +
+      'Dealer has dealt ' + dealerHand[0].name + dealerCardString +
       ' for a total score of ' + dealerScore + ' dealer draws again'
     );
     readlineSync.keyInPause();
